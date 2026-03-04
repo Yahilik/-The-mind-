@@ -15,7 +15,7 @@ Métodos
 • Void AplicarRecompensa(nivelActual)
 • Void VerificarOrdenCartas(mano, numeroCartasPorJugador)
 
-⸻
+
 
 Clase: Nivel
 
@@ -29,7 +29,7 @@ Métodos
 • Void CompletarNivel(nivelActual)
 • String DarRecompensa(nivelActual, recompensaVida, recompensaShuriken)
 
-⸻
+
 
 Clase: Mazo
 
@@ -40,7 +40,7 @@ Métodos
 • Void Barajar(numeroCartas)
 • String Repartir(numeroJugadores, nivelActual)
 
-⸻
+
 
 Clase: Carta
 
@@ -50,7 +50,7 @@ Atributos
 Métodos
 • String mostrar(numeroCartasPorJugador, mano)
 
-⸻
+
 
 Clase: Jugador
 
@@ -63,7 +63,7 @@ Métodos
 • Void JugarCarta(numeroCartasPorJugador, carta*)
 • Void LevantarMano(numeroShuriken, sincronizacion)
 
-⸻
+
 
 Clase: Equipo
 
@@ -74,14 +74,13 @@ Atributos
 Métodos
 • Bool Sincronizar(sincronizar, jugador*)
 
-⸻
 
 Inicio del Juego (Reglas)
 • El juego inicia con 2 vidas y 1 shuriken.
 • Las vidas y los shurikens no pueden ser negativos.
 • Número de jugadores: 2 (fijo).
 
-⸻
+
 
 Recompensas por Nivel
 • Nivel 1 → +1 Vida
