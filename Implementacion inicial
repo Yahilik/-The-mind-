@@ -1,0 +1,237 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <random>
+
+using namespace std;
+
+// ------------------ Clase Carta ------------------
+class Carta {
+private:
+    int numeroCarta;
+public:
+    Carta(int n = 0) : numeroCarta(n) {}
+
+    int getNumero() const {
+        return numeroCarta;
+    }
+
+    string mostrar() const {
+        return to_string(numeroCarta);
+    }
+};
+
+// ------------------ Clase Mazo ------------------
+class Mazo {
+private:
+    vector<Carta> cartas;
+public:
+    void Barajar(int numeroCartas) {
+        cartas.clear();
+        for (int i = 1; i <= numeroCartas; i++) {
+            cartas.push_back(Carta(i));
+        }
+        // Forma moderna y recomendada de generar aleatoriedad en C++
+        random_device rd;
+        mt19937 g(rd());
+        shuffle(cartas.begin(), cartas.end(), g);
+    }
+
+    vector<vector<Carta>> Repartir(int numeroJugadores, int nivelActual) {
+        vector<vector<Carta>> manos(numeroJugadores);
+        for (int i = 0; i < numeroJugadores; i++) {
+            for (int j = 0; j < nivelActual; j++) {
+                if (!cartas.empty()) {
+                    manos[i].push_back(cartas.back());
+                    cartas.pop_back();
+                }
+            }
+        }
+        // Ordenar las manos de menor a mayor internamente
+        for (auto &mano : manos) {
+            sort(mano.begin(), mano.end(), [](const Carta& a, const Carta& b) {
+                return a.getNumero() < b.getNumero();
+            });
+        }
+        return manos;
+    }
+};
+
+// ------------------ Clase Jugador ------------------
+class Jugador {
+private:
+    int IdJugador;
+    vector<Carta> Mano;
+    bool levantarMano;
+
+public:
+    Jugador(int id = 0) : IdJugador(id), levantarMano(false) {}
+
+    int getId() const { return IdJugador; }
+
+    void setMano(const vector<Carta>& nuevaMano) { Mano = nuevaMano; }
+
+    bool tieneCartas() const { return !Mano.empty(); }
+
+    int verSiguienteCarta() const {
+        if (!Mano.empty()) return Mano.front().getNumero();
+        return 999; // Valor alto si no tiene cartas
+    }
+
+    void JugarCarta(vector<int> &mesa) {
+        if (!Mano.empty()) {
+            cout << "Jugador " << IdJugador << " juega la carta: " << Mano.front().getNumero() << endl;
+            mesa.push_back(Mano.front().getNumero());
+            Mano.erase(Mano.begin());
+        }
+    }
+};
+
+// ------------------ Clase Equipo ------------------
+class Equipo {
+private:
+    vector<Jugador> jugadores;
+public:
+    void agregarJugador(const Jugador& j) {
+        jugadores.push_back(j);
+    }
+
+    vector<Jugador>& getJugadores() {
+        return jugadores;
+    }
+};
+
+// ------------------ Clase Nivel ------------------
+class Nivel {
+private:
+    int NumeroNivel;
+    int recompensaVida;
+    int recompensaShuriken;
+
+public:
+    Nivel(int n = 1) : NumeroNivel(n) {
+        // Lógica de recompensas intercaladas
+        recompensaVida = (n % 2 == 1 && n != 5) ? 1 : 0;
+        recompensaShuriken = (n % 2 == 0) ? 1 : 0;
+    }
+
+    void CompletarNivel() const {
+        cout << "¡Nivel " << NumeroNivel << " completado con exito!" << endl;
+    }
+
+    void DarRecompensa(int &vidas, int &shurikens) const {
+        vidas += recompensaVida;
+        shurikens += recompensaShuriken;
+        if (recompensaVida > 0 || recompensaShuriken > 0) {
+            cout << "Recompensas obtenidas: ";
+            if (recompensaVida) cout << "+1 Vida ";
+            if (recompensaShuriken) cout << "+1 Shuriken ";
+            cout << endl;
+        }
+    }
+};
+
+// ------------------ Clase Juego ------------------
+class Juego {
+private:
+    int NivelActual;
+    int Vidas;
+    int Shurikens;
+    string EstadoJuego;
+    Mazo mazo;
+    Equipo equipo;
+
+    bool VerificarOrdenCartas(const vector<int> &mesa) const {
+        for (size_t i = 1; i < mesa.size(); i++) {
+            if (mesa[i] < mesa[i - 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void PerderVida() {
+        if (Vidas > 0) {
+            Vidas--;
+            cout << "¡Se pierde una vida! Vidas restantes: " << Vidas << endl;
+        }
+        if (Vidas == 0) {
+            EstadoJuego = "Perdido";
+        }
+    }
+
+public:
+    Juego() : NivelActual(1), Vidas(2), Shurikens(1), EstadoJuego("En curso") {}
+
+    void iniciarJuego() {
+        equipo.agregarJugador(Jugador(1));
+        equipo.agregarJugador(Jugador(2));
+
+        while (EstadoJuego == "En curso" && NivelActual <= 5) {
+            cout << "\n==============================\n";
+            cout << "         NIVEL " << NivelActual << "\n";
+            cout << "==============================\n";
+
+            Nivel nivel(NivelActual);
+            mazo.Barajar(100);
+
+            // Repartir cartas
+            auto manos = mazo.Repartir(2, NivelActual);
+            equipo.getJugadores()[0].setMano(manos[0]);
+            equipo.getJugadores()[1].setMano(manos[1]);
+
+            vector<int> mesa;
+            bool errorEnNivel = false;
+
+            // Motor de Simulación Lógica
+            while (equipo.getJugadores()[0].tieneCartas() || equipo.getJugadores()[1].tieneCartas()) {
+                int indexMejorJugador = -1;
+                int cartaMinima = 999;
+
+                // Encontrar quién tiene la carta más baja de toda la mesa
+                for (size_t i = 0; i < equipo.getJugadores().size(); i++) {
+                    int cartaActual = equipo.getJugadores()[i].verSiguienteCarta();
+                    if (cartaActual < cartaMinima) {
+                        cartaMinima = cartaActual;
+                        indexMejorJugador = i;
+                    }
+                }
+
+                // El jugador con la carta más baja la juega
+                if (indexMejorJugador != -1) {
+                    equipo.getJugadores()[indexMejorJugador].JugarCarta(mesa);
+
+                    if (!VerificarOrdenCartas(mesa)) {
+                        cout << "¡Error de sincronizacion! Las cartas no estan en orden.\n";
+                        PerderVida();
+                        errorEnNivel = true;
+                        break; 
+                    }
+                }
+            }
+
+            if (EstadoJuego == "Perdido") break;
+
+            if (!errorEnNivel) {
+                nivel.CompletarNivel();
+                nivel.DarRecompensa(Vidas, Shurikens);
+                NivelActual++;
+            }
+        }
+
+        cout << "\n------------------------------\n";
+        if (EstadoJuego == "Perdido") {
+            cout << "Juego terminado. Se han quedado sin vidas.\n";
+        } else {
+            cout << "¡Felicidades! Han superado los 5 niveles.\n";
+        }
+        cout << "------------------------------\n";
+    }
+};
+
+// ------------------ MAIN ------------------
+int main() {
+    Juego juegoTheMind;
+    juegoTheMind.iniciarJuego();
+    return 0;
+}
