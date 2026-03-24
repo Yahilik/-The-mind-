@@ -150,7 +150,7 @@ public:
         equipo.agregarJugador(Jugador(1));
         equipo.agregarJugador(Jugador(2));
 
-        cout << "Bienvenido a THE MIND (Version Consola)\n";
+        cout << "Bienvenido a THE MIND\n";
         cout << "Regla principal: No pueden hablar. Sientan el paso del tiempo.\n";
         pausarYLimpiar();
 
