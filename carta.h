@@ -7,6 +7,6 @@ private:
     int numeroCarta;
 public:
     Carta(int n = 0);
-    int getNumero() const 
+    int getNumero() const;
 };
 #endif
