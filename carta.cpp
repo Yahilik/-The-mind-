@@ -1,7 +1,7 @@
-class Carta {
-private:
-    int numeroCarta;
-public:
-    Carta(int n = 0) : numeroCarta(n) {}
-    int getNumero() const { return numeroCarta; }
-};
+#include "Carta.h"
+
+Carta::Carta(int n) : numeroCarta(n) {}
+
+int Carta::getNumero() const { 
+    return numeroCarta; 
+}
