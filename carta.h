@@ -1,5 +1,12 @@
-Clase: Carta
+#ifndef CARTA_H
+#define CARTA_H
+#include <string>
 
-Atributos • Int numeroCarta
-
-Métodos • String mostrar(numeroCartasPorJugador, mano)
+class Carta {
+private:
+    int numeroCarta;
+public:
+    Carta(int n = 0);
+    int getNumero() const 
+};
+#endif
