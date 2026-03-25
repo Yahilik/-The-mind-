@@ -1,8 +1,31 @@
 #include "Juego.h"
 #include "Utils.h"
 #include <iostream>
+#include <fstream> // Librería para archivos
+
+using namespace std;
 
 Juego::Juego() : NivelActual(1), Vidas(2), Shurikens(1), EstadoJuego("En curso") {}
+
+void Juego::guardarPartida() {
+    ofstream archivo("partida.txt");
+    if (archivo.is_open()) {
+        archivo << NivelActual << " " << Vidas << " " << Shurikens;
+        archivo.close();
+        cout << "\n[!] Partida guardada automáticamente.\n";
+    }
+}
+
+void Juego::cargarPartida() {
+    ifstream archivo("partida.txt");
+    if (archivo.is_open()) {
+        archivo >> NivelActual >> Vidas >> Shurikens;
+        archivo.close();
+        cout << "\n[!] Partida cargada. Retomando en Nivel " << NivelActual << ".\n";
+    } else {
+        cout << "\n[!] No se encontró partida guardada. Iniciando desde cero.\n";
+    }
+}
 
 void Juego::PerderVida() {
     if (Vidas > 0) {
@@ -18,10 +41,17 @@ void Juego::iniciarJuego() {
     equipo.agregarJugador(Jugador(2));
 
     cout << "Bienvenido a THE MIND\n";
-    cout << "Regla principal: No pueden hablar. Sientan el paso del tiempo.\n";
+    
+    if (confirmarAccion("¿Deseas cargar una partida guardada?")) {
+        cargarPartida();
+    }
+
     pausarYLimpiar();
 
     while (EstadoJuego == "En curso" && NivelActual <= 5) {
+        // Guardamos al inicio de cada nivel
+        guardarPartida();
+
         mazo.Barajar(100);
         auto manos = mazo.Repartir(2, NivelActual);
         equipo.getJugadores()[0].setMano(manos[0]);
@@ -43,29 +73,25 @@ void Juego::iniciarJuego() {
             cout << "\n========================================\n";
             cout << "Ultima carta jugada en la mesa: " << (ultimaCartaMesa == 0 ? "Ninguna" : to_string(ultimaCartaMesa)) << "\n\n";
             
-            cout << "Jugadores, concentrense. Quien sienta que tiene la carta mas baja, actue.\n";
-            cout << "Ingrese 1 si lanza el Jugador 1 | Ingrese 2 si lanza el Jugador 2: ";
+            cout << "Ingrese 1 (Jugador 1) | Ingrese 2 (Jugador 2): ";
             
             string input;
             cin >> input;
 
-            if (input != "1" && input != "2") {
-                cout << "Entrada invalida. Intente de nuevo.\n";
-                continue;
-            }
+            if (input != "1" && input != "2") continue;
 
             int index = stoi(input) - 1;
             int indexOtro = (index == 0) ? 1 : 0;
 
             if (!equipo.getJugadores()[index].tieneCartas()) {
-                cout << "\nEl Jugador " << (index + 1) << " ya no tiene cartas. Debe jugar el otro.\n\n";
+                cout << "\nEl Jugador " << (index + 1) << " ya no tiene cartas.\n";
                 continue;
             }
 
             int cartaJugada = equipo.getJugadores()[index].verSiguienteCarta();
             int otraCarta = equipo.getJugadores()[indexOtro].verSiguienteCarta();
 
-            cout << "\n-> El Jugador " << (index + 1) << " decide lanzar un: " << cartaJugada << "\n";
+            cout << "\n-> El Jugador " << (index + 1) << " lanza: " << cartaJugada << "\n";
             equipo.getJugadores()[index].JugarCarta();
             ultimaCartaMesa = cartaJugada;
 
@@ -88,13 +114,12 @@ void Juego::iniciarJuego() {
     }
 
     limpiarPantalla();
-    cout << "\n========================================\n";
     if (EstadoJuego == "Perdido") {
-        cout << "              GAME OVER\n";
-        cout << " Se ha roto la conexion. Sin vidas.\n";
+        cout << "GAME OVER\n";
+        // Borramos el archivo al perder para no retomar una partida fallida
+        remove("partida.txt");
     } else {
-        cout << "              ¡VICTORIA!\n";
-        cout << " Mentes sincronizadas a la perfeccion.\n";
+        cout << "¡VICTORIA!\n";
+        remove("partida.txt");
     }
-    cout << "========================================\n";
 }
