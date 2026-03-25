@@ -1,7 +1,7 @@
 #include "Juego.h"
 #include "Utils.h"
 #include <iostream>
-#include <fstream> // Librería para archivos
+#include <fstream>
 
 using namespace std;
 
