@@ -116,7 +116,6 @@ void Juego::iniciarJuego() {
     limpiarPantalla();
     if (EstadoJuego == "Perdido") {
         cout << "GAME OVER\n";
-        // Borramos el archivo al perder para no retomar una partida fallida
         remove("partida.txt");
     } else {
         cout << "¡VICTORIA!\n";
