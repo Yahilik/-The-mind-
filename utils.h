@@ -3,6 +3,6 @@
 
 void limpiarPantalla();
 void pausarYLimpiar();
-bool confirmarAccion(const char* mensaje); // Nueva función
+bool confirmarAccion(const char* mensaje);
 
 #endif
