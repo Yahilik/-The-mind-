@@ -18,8 +18,8 @@ private:
     Equipo equipo;
 
     void PerderVida();
-    void guardarPartida(); // Nueva función
-    void cargarPartida();  // Nueva función
+    void guardarPartida();
+    void cargarPartida();
 
 public:
     Juego();
