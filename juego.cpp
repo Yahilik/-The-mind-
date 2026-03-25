@@ -49,7 +49,6 @@ void Juego::iniciarJuego() {
     pausarYLimpiar();
 
     while (EstadoJuego == "En curso" && NivelActual <= 5) {
-        // Guardamos al inicio de cada nivel
         guardarPartida();
 
         mazo.Barajar(100);
